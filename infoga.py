@@ -46,7 +46,7 @@ g = color.incolor.GREEN
 b = color.incolor.BLUE
 c = color.incolor.CRIMSON
 y = color.incolor.CYAN
-
+i = color.incolor.IND
 try:
 	import sys
 	import urllib3
@@ -72,18 +72,19 @@ def banner():
 	print r+" |::.|"+t+y+" Infoga %s - %s         "% (info.__version__,info.__info__)
 	print r+" |:..|"+t+y+" Codename\t- %s         "% (info.__codename__)
 	print r+" |...|"+t+y+" Coded by\t- %s         "% (info.__author__)
-	print r+" `---'                             \n"+t
+	print r+" | - |"+i+" https://github.com/m4ll0k/infoga"+t+t
+	print r+" `---'                               \n"+t
 
 def usage():
 	scr = os.path.basename(sys.argv[0])
 	banner()
 	print w+"Usage: Infoga -t [target] -s [source]:\n"+t
 	print w+"\t-t\tDomain to search or company name"+t
-	print w+"\t-s\tData source: all, google, bing"+t
+	print w+"\t-s\tData source: all, google, bing, pgp"+t
 	print w+"\t-h\tShow this help and exit\n"+t
 	print w+"Examples:"+t
 	print w+"\t"+scr+" -t site.com -s all"+t
-	print w+"\t"+scr+" -t site.com -s [google, bing]\n"+t
+	print w+"\t"+scr+" -t site.com -s [google, bing, pgp]\n"+t
 
 
 def start(argv):
@@ -102,9 +103,9 @@ def start(argv):
 			usage()
 		elif opt == "-s":
 			engine = arg
-			if engine not in ("all, google, bing"):
+			if engine not in ("all, google, bing, pgp"):
 				usage()
-				print r+"[!] "+t+w+"Invalid search engine, try with: all, google or bing\n"+t 
+				print r+"[!] "+t+w+"Invalid search engine, try with: all, google, bing or pgp\n"+t 
 				sys.exit(0) 
 			else:
 				pass
@@ -120,27 +121,40 @@ def start(argv):
 	strf = "[%s] "%(strftime('%H:%M:%S'))
 	if engine == "google":
 		banner()
-		print w+strf+t+y+"Searching in google..."+t
+		print w+strf+t+y+"Searching \""+keyword+"\" in google..."+t 
 		_search = googlesearch.google_search(keyword)
 		_search.process()
 		_allemails = _search.get_emails()
 
 	elif engine == "bing": 
 		banner()
-		print w+strf+t+y+"Searching in bing..."+t
+		print w+strf+t+y+"Searching \""+keyword+"\" in bing..."+t
 		_search = bingsearch.bing_search(keyword)
+		_search.process()
+		_allemails = _search.get_emails()
+
+	elif engine == "pgp":
+		banner()
+		print w+strf+t+y+"Searching \""+keyword+"\" in pgp..."+t
+		_search = pgpsearch.pgp_search(keyword)
 		_search.process()
 		_allemails = _search.get_emails()
 
 	elif engine == "all":
 		banner()
-		print w+strf+t+y+"Searching in google..."+t
+		print w+strf+t+y+"Searching \""+keyword+"\" in google..."+t
 		_search = googlesearch.google_search(keyword)
 		_search.process()
 		_emails = _search.get_emails()
 		_allemails.extend(_emails)
-		print w+strf+t+y+"Searching in bing..."+t
+		print w+strf+t+y+"Searching \""+keyword+"\" in bing..."+t
 		_search = bingsearch.bing_search(keyword)
+		_search.process()
+		_emails = _search.get_emails()
+		_allemails.extend(_emails)
+		_allemails = sorted(set(_allemails))
+		print w+strf+t+y+"Searching \""+keyword+"\" in pgp..."+t
+		_search = pgpsearch.pgp_search(keyword)
 		_search.process()
 		_emails = _search.get_emails()
 		_allemails.extend(_emails)
@@ -164,10 +178,14 @@ def start(argv):
 			print r+"Email: "+t+"%s"%(_allemails[x])
 			for d in range(len(new)):
 				v = '\n'.join(new)
-				con = socket.gethostbyaddr(v)
+				try:
+					con = socket.gethostbyaddr(v)
+				except socket.error:
+					pass
 				rf = urllib3.PoolManager()
 				res = rf.request('GET', "https://api.shodan.io/shodan/host/%s?key=UNmOjxeFS2mPA3kmzm1sZwC0XjaTTksy"% (new[d]))
 				h = json.loads(res.data, 'utf-8')
+
 				if 'country_code' and 'country_name' in h:
 					print "\t\t\t|__ %s%s%s (%s)"% (g,new[d],t,con[0])
 					print "\t\t\t|\t|"

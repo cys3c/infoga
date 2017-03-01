@@ -13,3 +13,4 @@ class incolor:
 	YELLOW = '\033[1;33m'
 	CRIMSON = '\033[1;38m'
 	RESET = '\033[0m'
+	IND = '\033[04m'

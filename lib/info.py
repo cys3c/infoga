@@ -5,7 +5,7 @@
 
 __info__ = 'Gathering Email Information'
 __author__ = 'M0M0 (M4ll0k)'
-__version__ = 'v2.0'
-__codename__ = '3.Giulia'
+__version__ = 'v2.1'
+__codename__ = '\"giulia\"'
 
 

@@ -40,7 +40,7 @@ class google_search:
 			print str(err)
 
 	def get_emails(self):
-		_findemails = parser.inparser(self.results, self.keyword)
+		_findemails = parser.inparser(self.tresult, self.keyword)
 		return _findemails._emails()
 
 	def process(self):
